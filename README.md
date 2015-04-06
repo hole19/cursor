@@ -17,6 +17,8 @@ Suppose we have users with ids 1..100
 => 45
 > User.page(before: 50).per(5).prev_cursor
 => 49
+> User.page(before: 50).per(5).since_cursor
+=> 49
 ```
 
 The before id is NOT included in the results. The next and previous cursors are the min and max ids of the returned set, respectively.
@@ -28,6 +30,8 @@ The before id is NOT included in the results. The next and previous cursors are 
 => 49
 > User.page(before: 50).per(5).prev_cursor
 => 45
+> User.page(before: 50).per(5).since_cursor
+=> 49
 ```
 
 Note that the results are reversed from the before. Before implies order desc. After implies order asc. The cursors are similarly reversed. In both before and after, the specified cursor in the request is excluded from the result.
@@ -38,6 +42,22 @@ Note that the results are reversed from the before. Before implies order desc. A
 ```
 
 The default direction is *before* and the default ``per_page`` value is 25.
+
+```
+> User.page(before: 50, since: 46).per(5)
+=> [#<User id: 49>, #<User id: 48>, #<User id: 47>]  
+> User.page(before: 50, since: 46).per(5).next_cursor
+=> 49
+> User.page(before: 50, since: 46).per(5).prev_cursor
+=> 47
+> User.page(before: 50, since: 46).per(5).since_cursor
+=> 49
+
+> User.page(since: 46).per(5)
+=> [#<User id: 100>, #<User id: 99>, #<User id: 98>, #<User id: 97>, #<User id: 96>]  
+```
+
+The ``since`` option will return the most recent results since the specified id.
 
 
 # Configuration Options
@@ -50,6 +70,7 @@ max_per_page      # nil by default
 page_method_name  # :page by default
 before_param_name # :before by default
 after_param_name  # :after by default
+since_param_name  # :since by default
 ```
 
 There's a handy generator that generates the default configuration file into config/initializers directory. Run the following generator command, then edit the generated file.

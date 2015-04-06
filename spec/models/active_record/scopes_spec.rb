@@ -31,58 +31,65 @@ if defined? ActiveRecord
     its('first.name') { should == 'user100' }
   end
 
-
   shared_examples_for 'blank page' do
     it { should have(0).users }
   end
 
   shared_examples_for 'before pagination' do
     it {
-      expect(subject[:next_url]).to include('before=76')
-      expect(subject[:prev_url]).to include('after=100')
-      expect(subject[:prev_url].scan('after').length).to eq(1)
-      expect(subject[:next_url].scan('before').length).to eq(1)
-      expect(subject[:next_url]).to_not include('after')
-      expect(subject[:prev_url]).to_not include('before')
+      expect(subject[:next_url]).to    include('before=76')
+      expect(subject[:prev_url]).to    include('after=100')
+      expect(subject[:refresh_url]).to include('since=100')
+      expect(subject[:prev_url].scan('after').length).to    eq(1)
+      expect(subject[:next_url].scan('before').length).to   eq(1)
+      expect(subject[:refresh_url].scan('since').length).to eq(1)
+      expect(subject[:next_url]).to_not    include('after', 'since')
+      expect(subject[:prev_url]).to_not    include('before', 'since')
+      expect(subject[:refresh_url]).to_not include('before', 'after')
     }
   end
 
   shared_examples_for 'after pagination' do
     it {
-      expect(subject[:next_url]).to include('after=25')
-      expect(subject[:prev_url]).to include('before=1')
-      expect(subject[:next_url].scan('after').length).to eq(1)
-      expect(subject[:prev_url].scan('before').length).to eq(1)
-      expect(subject[:next_url]).to_not include('before')
-      expect(subject[:prev_url]).to_not include('after')
+      expect(subject[:next_url]).to    include('after=25')
+      expect(subject[:prev_url]).to    include('before=1')
+      expect(subject[:refresh_url]).to include('since=25')
+      expect(subject[:next_url].scan('after').length).to    eq(1)
+      expect(subject[:prev_url].scan('before').length).to   eq(1)
+      expect(subject[:refresh_url].scan('since').length).to eq(1)
+      expect(subject[:next_url]).to_not    include('before', 'since')
+      expect(subject[:prev_url]).to_not    include('after', 'since')
+      expect(subject[:refresh_url]).to_not include('before', 'after')
     }
   end
-
 
   describe Cursor::ActiveRecordExtension do
     it 'returns no after cursor when there are no records' do
       params = User.page(after: 0).pagination('http://example.com')
-      expect(params.has_key?(:next_url)).to be_false
-      expect(params.has_key?(:prev_url)).to be_false
-      expect(params[:next_cursor]).to be_nil
-      expect(params[:prev_cursor]).to be_nil
+      expect(params.key?(:next_url)).to    be_false
+      expect(params.key?(:prev_url)).to    be_false
+      expect(params.key?(:refresh_url)).to be_false
+      expect(params[:next_cursor]).to  be_nil
+      expect(params[:prev_cursor]).to  be_nil
+      expect(params[:since_cursor]).to be_nil
     end
 
     it 'returns no before cursor when there are no records' do
       params = User.page(before: 0).pagination('http://example.com')
-      expect(params.has_key?(:next_url)).to be_false
-      expect(params.has_key?(:prev_url)).to be_false
-      expect(params[:next_cursor]).to be_nil
-      expect(params[:prev_cursor]).to be_nil
+      expect(params.key?(:next_url)).to    be_false
+      expect(params.key?(:prev_url)).to    be_false
+      expect(params.key?(:refresh_url)).to be_false
+      expect(params[:next_cursor]).to  be_nil
+      expect(params[:prev_cursor]).to  be_nil
+      expect(params[:since_cursor]).to be_nil
     end
   end
 
-
   describe Cursor::ActiveRecordExtension do
     before do
-      1.upto(100) {|i| User.create! :name => "user#{'%03d' % i}", :age => (i / 10)}
-      1.upto(100) {|i| GemDefinedModel.create! :name => "user#{'%03d' % i}", :age => (i / 10)}
-      1.upto(100) {|i| Device.create! :name => "user#{'%03d' % i}", :age => (i / 10)}
+      1.upto(100) { |i| User.create! name: "user#{'%03d' % i}", age: (i / 10) }
+      1.upto(100) { |i| GemDefinedModel.create! name: "user#{'%03d' % i}", age: (i / 10) }
+      1.upto(100) { |i| Device.create! name: "user#{'%03d' % i}", age: (i / 10) }
     end
 
     [User, Admin, GemDefinedModel, Device].each do |model_class|
@@ -95,6 +102,11 @@ if defined? ActiveRecord
 
           context 'page 1 before' do
             subject { model_class.page(before: 101) }
+            it_should_behave_like 'the first before page'
+          end
+
+          context 'page 1 since' do
+            subject { model_class.page(since: 50) }
             it_should_behave_like 'the first before page'
           end
 
@@ -111,7 +123,7 @@ if defined? ActiveRecord
           end
 
           context 'page without an argument' do
-            subject { model_class.page() }
+            subject { model_class.page }
             it_should_behave_like 'the first before page'
           end
 
@@ -135,9 +147,31 @@ if defined? ActiveRecord
             it_should_behave_like 'the first before page'
           end
 
+          context 'before > since' do
+            subject { model_class.page(before: 50, since: 44) }
+            it { should have(5).users }
+            its('first.name') { should == 'user049' }
+          end
+
+          context 'after > since' do
+            subject { model_class.page(after: 50, since: 44) }
+            it { should have(25).users }
+            its('first.name') { should == 'user051' }
+          end
+
+          context 'after < since' do
+            subject { model_class.page(after: 50, since: 95) }
+            it { should have(5).users }
+            its('first.name') { should == 'user096' }
+          end
+
+          context 'before <= since' do
+            subject { model_class.page(before: 50, since: 50) }
+            it_should_behave_like 'blank page'
+          end
 
           describe 'ensure #order_values is preserved' do
-            subject { model_class.order('id').page() }
+            subject { model_class.order('id').page }
             its('order_values.uniq') { should == ["#{model_class.table_name}.id desc"] }
           end
         end
@@ -149,14 +183,13 @@ if defined? ActiveRecord
             its('first.name') { should == 'user100' }
           end
 
-          context "default page per nil (using default)" do
+          context 'default page per nil (using default)' do
             subject { model_class.page.per(nil) }
             it { should have(model_class.default_per_page).users }
           end
         end
 
         describe '#next_cursor' do
-
           context 'after 1st page' do
             subject { model_class.page(after: 0) }
             its(:next_cursor) { should == 25 }
@@ -169,20 +202,19 @@ if defined? ActiveRecord
 
           context 'before 1st page' do
             subject { model_class.page }
-            its(:next_cursor) { should == 76}
+            its(:next_cursor) { should == 76 }
           end
 
           context 'before middle page' do
             subject { model_class.page(before: 50) }
-            its(:next_cursor) { should == 25}
+            its(:next_cursor) { should == 25 }
           end
-
         end
 
         describe '#prev_cursor' do
           context 'after 1st page' do
             subject { model_class.page(after: 0) }
-            its(:prev_cursor) { should == 1}
+            its(:prev_cursor) { should == 1 }
           end
 
           context 'after middle page' do
@@ -192,14 +224,36 @@ if defined? ActiveRecord
 
           context 'before 1st page' do
             subject { model_class.page }
-            its(:prev_cursor) { should == 100}
+            its(:prev_cursor) { should == 100 }
           end
 
           context 'before middle page' do
             subject { model_class.page(before: 50) }
-            its(:prev_cursor) { should == 49}
+            its(:prev_cursor) { should == 49 }
           end
-        end 
+        end
+
+        describe '#since_cursor' do
+          context 'after 1st page' do
+            subject { model_class.page(after: 0) }
+            its(:since_cursor) { should == 25 }
+          end
+
+          context 'after middle page' do
+            subject { model_class.page(after: 50) }
+            its(:since_cursor) { should == 75 }
+          end
+
+          context 'before 1st page' do
+            subject { model_class.page }
+            its(:since_cursor) { should == 100 }
+          end
+
+          context 'before middle page' do
+            subject { model_class.page(before: 50) }
+            its(:since_cursor) { should == 49 }
+          end
+        end
 
         describe '#pagination' do
           context 'before' do
@@ -210,6 +264,11 @@ if defined? ActiveRecord
           context 'after' do
             subject { model_class.page(after: 0).pagination('http://example.com') }
             it_should_behave_like 'after pagination'
+          end
+
+          context 'since' do
+            subject { model_class.page(since: 0).pagination('http://example.com?after=10&before=10') }
+            it_should_behave_like 'before pagination'
           end
 
           context 'before with existing before query param' do
@@ -237,7 +296,6 @@ if defined? ActiveRecord
             it_should_behave_like 'before pagination'
             specify { expect(subject[:next_url]).to include('a[]=one&a[]=two') }
           end
-
         end
       end
     end

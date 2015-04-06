@@ -11,9 +11,10 @@ module Cursor
       eval <<-RUBY
         def self.#{Cursor.config.page_method_name}(options={})
           (options || {}).to_hash.symbolize_keys!
-          options[:direction] = options.keys.include?(:after) ? :after : :before
+          options[:direction] = options.keys.include?(Cursor.config.after_param_name) ? Cursor.config.after_param_name : Cursor.config.before_param_name
 
           on_cursor(options[options[:direction]], options[:direction]).
+          on_since(options[Cursor.config.since_param_name]).
           in_direction(options[:direction]).
           limit(default_per_page).extending do
             include Cursor::PageScopeMethods
@@ -26,6 +27,14 @@ module Cursor
           where(nil)
         else
           where(["#{self.table_name}.id #{direction == Cursor.config.after_param_name ? '>' : '<'} ?", cursor_id])
+        end
+      end
+
+      def self.on_since since_id
+        if since_id.nil?
+          where(nil)
+        else
+          where("#{self.table_name}.id > ?", since_id)
         end
       end
 

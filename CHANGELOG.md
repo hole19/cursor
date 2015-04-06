@@ -1,3 +1,8 @@
+# 0.2.0
+
+* add support for since param in the page method
+  * include since_cursor and refresh_url to pagination results
+
 # 0.1.2
 
 * added support for ActiveRecord version 4.2

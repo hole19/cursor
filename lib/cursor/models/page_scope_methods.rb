@@ -18,7 +18,7 @@ module Cursor
     end
 
     def prev_cursor
-      @_prev_cursor ||= all.first.try(:id)
+      @_prev_cursor ||= all[0].try(:id)
     end
 
     def since_cursor

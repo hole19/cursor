@@ -22,6 +22,7 @@ module Cursor
     config_accessor :page_method_name
     config_accessor :before_param_name
     config_accessor :after_param_name
+    config_accessor :since_param_name
 
     def before_param_name
       config.before_param_name.respond_to?(:call) ? config.before_param_name.call : config.before_param_name
@@ -31,6 +32,9 @@ module Cursor
       config.after_param_name.respond_to?(:call) ? config.after_param_name.call : config.after_param_name
     end
 
+    def since_param_name
+      config.since_param_name.respond_to?(:call) ? config.since_param_name.call : config.since_param_name
+    end
 
     # define param_name writer (copied from AS::Configurable)
     writer, line = 'def before_param_name=(value); config.before_param_name = value; end', __LINE__
@@ -38,6 +42,10 @@ module Cursor
     class_eval writer, __FILE__, line
 
     writer, line = 'def after_param_name=(value); config.after_param_name = value; end', __LINE__
+    singleton_class.class_eval writer, __FILE__, line
+    class_eval writer, __FILE__, line
+
+    writer, line = 'def since_param_name=(value); config.since_param_name = value; end', __LINE__
     singleton_class.class_eval writer, __FILE__, line
     class_eval writer, __FILE__, line
 
@@ -50,5 +58,6 @@ module Cursor
     config.page_method_name = :page
     config.before_param_name = :before
     config.after_param_name = :after
+    config.since_param_name = :since
   end
 end

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "configuration methods" do
-  let(:model){ User }
+  let(:model) { User }
 
   describe "#default_per_page" do
     if defined? ActiveRecord
@@ -11,7 +11,7 @@ describe "configuration methods" do
       end
     end
 
-    subject { model.page() }
+    subject { model.page }
 
     context "by default" do
       its(:limit_value){ should == 25 }

@@ -12,13 +12,17 @@ module Cursor
       end
     end
 
-    # TODO: are these 2 methods triggering multiple db hits? want to run this on cached result
+    # To avoid multiple db hist on these 2 methods, enable perform_caching to perform this on cached result
     def next_cursor
       @_next_cursor ||= all.last.try(:id)
     end
 
     def prev_cursor
       @_prev_cursor ||= all.first.try(:id)
+    end
+
+    def since_cursor
+      direction == :after ? next_cursor : prev_cursor
     end
 
     def next_url request_url
@@ -33,15 +37,21 @@ module Cursor
         after_url(request_url, prev_cursor)
     end
 
+    def refresh_url request_url
+      cursor_url(request_url, Cursor.config.since_param_name.to_s, since_cursor)
+    end
+
     def before_url request_url, cursor
-      base, params = url_parts(request_url)
-      params.merge!(Cursor.config.before_param_name.to_s => cursor) unless cursor.nil?
-      params.to_query.length > 0 ? "#{base}?#{CGI.unescape(params.to_query)}" : base
+      cursor_url(request_url, Cursor.config.before_param_name.to_s, cursor)
     end
 
     def after_url request_url, cursor
+      cursor_url(request_url, Cursor.config.after_param_name.to_s, cursor)
+    end
+
+    def cursor_url request_url, cursor_param, cursor
       base, params = url_parts(request_url)
-      params.merge!(Cursor.config.after_param_name.to_s => cursor) unless cursor.nil?
+      params.merge!(cursor_param => cursor) unless cursor.nil?
       params.to_query.length > 0 ? "#{base}?#{CGI.unescape(params.to_query)}" : base
     end
 
@@ -49,8 +59,9 @@ module Cursor
       base, params = request_url.split('?', 2)
       params = Rack::Utils.parse_nested_query(params || '')
       params.stringify_keys!
-      params.delete('before')
-      params.delete('after')
+      params.delete(Cursor.config.before_param_name.to_s)
+      params.delete(Cursor.config.after_param_name.to_s)
+      params.delete(Cursor.config.since_param_name.to_s)
       [base, params]
     end
 
@@ -61,11 +72,13 @@ module Cursor
 
     def pagination request_url
       h = {
-        next_cursor: next_cursor,
-        prev_cursor: prev_cursor
+        next_cursor:  next_cursor,
+        prev_cursor:  prev_cursor,
+        since_cursor: since_cursor
       }
-      h[:next_url] = next_url(request_url) unless next_cursor.nil?
-      h[:prev_url] = prev_url(request_url) unless prev_cursor.nil?
+      h[:next_url]    = next_url(request_url)    unless next_cursor.nil?
+      h[:prev_url]    = prev_url(request_url)    unless prev_cursor.nil?
+      h[:refresh_url] = refresh_url(request_url) unless since_cursor.nil?
       h
     end
   end

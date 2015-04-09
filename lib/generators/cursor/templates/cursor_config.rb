@@ -1,4 +1,5 @@
 Cursor.configure do |config|
+  # config.default_page_by = :id
   # config.default_per_page = 25
   # config.max_per_page = nil
   # config.page_method_name = :page

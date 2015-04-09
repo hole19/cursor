@@ -2,6 +2,7 @@
 
 * add support for since param in the page method
   * include since_cursor and refresh_url to pagination results
+* add default_page_by config option to change the cursored model column. default remains :id  
 
 # 0.1.2
 

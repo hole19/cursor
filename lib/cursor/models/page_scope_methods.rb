@@ -14,11 +14,11 @@ module Cursor
 
     # To avoid multiple db hist on these 2 methods, enable perform_caching to perform this on cached result
     def next_cursor
-      @_next_cursor ||= all.last.try(:id)
+      @_next_cursor ||= all.last.try(self.default_page_by)
     end
 
     def prev_cursor
-      @_prev_cursor ||= all[0].try(:id)
+      @_prev_cursor ||= all[0].try(self.default_page_by)
     end
 
     def since_cursor

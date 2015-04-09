@@ -31,6 +31,23 @@ module Cursor
         (defined?(@_max_per_page) && @_max_per_page) || Cursor.config.max_per_page
       end
 
+      # Overrides the default +page_by+ field per model
+      #   class Article < ActiveRecord::Base
+      #     page_by :created_at
+      #   end
+      def page_by(field)
+        if column_names.include?(field.to_s)
+          @_default_page_by = field
+        else
+          raise ArgumentError.new('Field is not a model column')
+        end
+      end
+
+      # This model's default +page_by+ field
+      # returns +default_page_by+ value unless explicitly overridden via <tt>page_by</tt>
+      def default_page_by
+        (defined?(@_default_page_by) && @_default_page_by) || Cursor.config.default_page_by
+      end
     end
   end
 end

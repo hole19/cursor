@@ -36,7 +36,7 @@ if defined? ActiveRecord
   end
 
   shared_examples_for 'before pagination' do
-    it {
+    it do
       expect(subject[:next_url]).to    include('before=76')
       expect(subject[:prev_url]).to    include('after=100')
       expect(subject[:refresh_url]).to include('since=100')
@@ -46,11 +46,11 @@ if defined? ActiveRecord
       expect(subject[:next_url]).to_not    include('after', 'since')
       expect(subject[:prev_url]).to_not    include('before', 'since')
       expect(subject[:refresh_url]).to_not include('before', 'after')
-    }
+    end
   end
 
   shared_examples_for 'after pagination' do
-    it {
+    it do
       expect(subject[:next_url]).to    include('after=25')
       expect(subject[:prev_url]).to    include('before=1')
       expect(subject[:refresh_url]).to include('since=25')
@@ -60,7 +60,7 @@ if defined? ActiveRecord
       expect(subject[:next_url]).to_not    include('before', 'since')
       expect(subject[:prev_url]).to_not    include('after', 'since')
       expect(subject[:refresh_url]).to_not include('before', 'after')
-    }
+    end
   end
 
   describe Cursor::ActiveRecordExtension do

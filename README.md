@@ -2,7 +2,7 @@
 
 Cursor is a fork of [Kaminari](https://github.com/amatsuda/kaminari) that has been gutted to perform cursor pagination only for Rails and ActiveRecord
 
-It’s currently a very simple implementation that pages by the id of the primary table.
+It’s currently a very simple implementation that pages by selected field of the primary table. It uses the id by default.
 
 
 # Usage
@@ -65,6 +65,7 @@ The ``since`` option will return the most recent results since the specified id.
 You can configure the following default values by overriding these values using Cursor.configure method.
 
 ```
+default_page_by   # :id by default
 default_per_page  # 25 by default
 max_per_page      # nil by default
 page_method_name  # :page by default

@@ -22,24 +22,24 @@ module Cursor
         end
       RUBY
 
-      def self.on_cursor cursor_id, direction
-        if cursor_id.nil?
+      def self.on_cursor cursor_value, direction
+        if cursor_value.nil?
           where(nil)
         else
-          where(["#{self.table_name}.id #{direction == Cursor.config.after_param_name ? '>' : '<'} ?", cursor_id])
+          where(["#{self.table_name}.#{self.default_page_by} #{direction == Cursor.config.after_param_name ? '>' : '<'} ?", cursor_value])
         end
       end
 
-      def self.on_since since_id
-        if since_id.nil?
+      def self.on_since since_value
+        if since_value.nil?
           where(nil)
         else
-          where("#{self.table_name}.id > ?", since_id)
+          where("#{self.table_name}.#{self.default_page_by} > ?", since_value)
         end
       end
 
       def self.in_direction direction
-        reorder("#{self.table_name}.id #{direction == Cursor.config.after_param_name ? 'asc' : 'desc'}")
+        reorder("#{self.table_name}.#{self.default_page_by} #{direction == Cursor.config.after_param_name ? 'asc' : 'desc'}")
       end
     end
   end

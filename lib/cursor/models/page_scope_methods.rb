@@ -12,13 +12,14 @@ module Cursor
       end
     end
 
-    # To avoid multiple db hist on these 2 methods, enable perform_caching to perform this on cached result
+    # To avoid multiple db hist on these 2 methods, 
+    # enable perform_caching to perform this on cached result
     def next_cursor
-      @_next_cursor ||= all.last.try(self.default_page_by)
+      @_next_cursor ||= send_chain(all.last.try(default_page_by), default_processors)
     end
 
     def prev_cursor
-      @_prev_cursor ||= all[0].try(self.default_page_by)
+      @_prev_cursor ||= send_chain(all[0].try(default_page_by), default_processors)
     end
 
     def since_cursor
@@ -80,6 +81,12 @@ module Cursor
       h[:prev_url]    = prev_url(request_url)    unless prev_cursor.nil?
       h[:refresh_url] = refresh_url(request_url) unless since_cursor.nil?
       h
+    end
+
+    private
+
+    def send_chain(object, arr)
+      arr.inject(object) { |o, a| o.public_send(a); o } if object
     end
   end
 end

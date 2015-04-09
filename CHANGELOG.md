@@ -1,8 +1,9 @@
 # 0.2.0
 
-* add support for since param in the page method
+* added support for since param in the page method
   * include since_cursor and refresh_url to pagination results
-* add default_page_by config option to change the cursored model column. default remains :id  
+* added default_page_by configuration option to change the cursored model column. default remains :id
+* added default_processors configuration to process output cursor values 
 
 # 0.1.2
 

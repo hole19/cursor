@@ -65,13 +65,14 @@ The ``since`` option will return the most recent results since the specified id.
 You can configure the following default values by overriding these values using Cursor.configure method.
 
 ```
-default_page_by   # :id by default
-default_per_page  # 25 by default
-max_per_page      # nil by default
-page_method_name  # :page by default
-before_param_name # :before by default
-after_param_name  # :after by default
-since_param_name  # :since by default
+default_page_by     # :id by default
+default_processors  # nil by default
+default_per_page    # 25 by default
+max_per_page        # nil by default
+page_method_name    # :page by default
+before_param_name   # :before by default
+after_param_name    # :after by default
+since_param_name    # :since by default
 ```
 
 There's a handy generator that generates the default configuration file into config/initializers directory. Run the following generator command, then edit the generated file.

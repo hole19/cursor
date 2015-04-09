@@ -33,11 +33,12 @@ module Cursor
 
       # Overrides the default +page_by+ field per model
       #   class Article < ActiveRecord::Base
-      #     page_by :created_at
+      #     page_by :created_at, :to_i
       #   end
-      def page_by(field)
+      def page_by(field, *processors)
         if column_names.include?(field.to_s)
           @_default_page_by = field
+          @_default_processors = processors
         else
           raise ArgumentError.new('Field is not a model column')
         end
@@ -47,6 +48,12 @@ module Cursor
       # returns +default_page_by+ value unless explicitly overridden via <tt>page_by</tt>
       def default_page_by
         (defined?(@_default_page_by) && @_default_page_by) || Cursor.config.default_page_by
+      end
+
+      # This model's default field +processors+
+      # returns +default_processors+ unless explicitly overridden via <tt>page_by</tt>
+      def default_processors
+        (defined?(@_default_processors) && @_default_processors) || Cursor.config.default_processors
       end
     end
   end

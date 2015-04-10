@@ -17,8 +17,7 @@ module Cursor
   # need a Class for 3.0
   class Configuration #:nodoc:
     include ActiveSupport::Configurable
-    config_accessor :default_page_by
-    config_accessor :default_processors
+    config_accessor :default_paginate_by
     config_accessor :default_per_page
     config_accessor :max_per_page
     config_accessor :page_method_name
@@ -55,8 +54,7 @@ module Cursor
 
   # this is ugly. why can't we pass the default value to config_accessor...?
   configure do |config|
-    config.default_page_by = :id
-    config.default_processors = []
+    config.default_paginate_by = :id
     config.default_per_page = 25
     config.max_per_page = nil
     config.page_method_name = :page

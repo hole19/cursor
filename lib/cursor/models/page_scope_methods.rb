@@ -15,11 +15,11 @@ module Cursor
     # To avoid multiple db hist on these 2 methods, 
     # enable perform_caching to perform this on cached result
     def next_cursor
-      @_next_cursor ||= send_chain(all.last.try(default_page_by), default_processors)
+      @_next_cursor ||= send_chain(all.last.try(default_paginate_by), cursor_processors)
     end
 
     def prev_cursor
-      @_prev_cursor ||= send_chain(all[0].try(default_page_by), default_processors)
+      @_prev_cursor ||= send_chain(all[0].try(default_paginate_by), cursor_processors)
     end
 
     def since_cursor
@@ -86,7 +86,7 @@ module Cursor
     private
 
     def send_chain(object, arr)
-      arr.inject(object) { |o, a| o.public_send(a); o } if object
+      arr.inject(object) { |a, e| a.public_send(e) } if object
     end
   end
 end

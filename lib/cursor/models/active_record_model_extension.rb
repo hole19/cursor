@@ -26,7 +26,7 @@ module Cursor
         if cursor_value.nil?
           where(nil)
         else
-          where(["#{self.table_name}.#{self.default_page_by} #{direction == Cursor.config.after_param_name ? '>' : '<'} ?", cursor_value])
+          where(["#{table_name}.#{default_paginate_by} #{direction == Cursor.config.after_param_name ? '>' : '<'} ?", cursor_value])
         end
       end
 
@@ -34,12 +34,12 @@ module Cursor
         if since_value.nil?
           where(nil)
         else
-          where("#{self.table_name}.#{self.default_page_by} > ?", since_value)
+          where("#{table_name}.#{default_paginate_by} > ?", since_value)
         end
       end
 
       def self.in_direction direction
-        reorder("#{self.table_name}.#{self.default_page_by} #{direction == Cursor.config.after_param_name ? 'asc' : 'desc'}")
+        reorder("#{table_name}.#{default_paginate_by} #{direction == Cursor.config.after_param_name ? 'asc' : 'desc'}")
       end
     end
   end

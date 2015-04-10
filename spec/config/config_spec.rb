@@ -61,9 +61,9 @@ describe Cursor::Configuration do
     end
   end
 
-  describe 'default_page_by' do
+  describe 'default_paginate_by' do
     it_behaves_like 'a configuration parameter' do
-      let(:config_name)   { :default_page_by }
+      let(:config_name)   { :default_paginate_by }
       let(:default_value) { :id }
       let(:test_value)    { :test }
     end

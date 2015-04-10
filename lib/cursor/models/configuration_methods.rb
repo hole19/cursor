@@ -31,29 +31,29 @@ module Cursor
         (defined?(@_max_per_page) && @_max_per_page) || Cursor.config.max_per_page
       end
 
-      # Overrides the default +page_by+ field per model
+      # Overrides the default +paginate_by+ field per model
       #   class Article < ActiveRecord::Base
-      #     page_by :created_at, :to_i
+      #     paginate_by :created_at, { processors: [:to_i] }
       #   end
-      def page_by(field, *processors)
+      def paginate_by(field, options = {})
         if column_names.include?(field.to_s)
-          @_default_page_by = field
-          @_default_processors = processors
+          @_default_paginate_by = field
+          @_cursor_processors   = options[:processors]
         else
           raise ArgumentError.new('Field is not a model column')
         end
       end
 
-      # This model's default +page_by+ field
-      # returns +default_page_by+ value unless explicitly overridden via <tt>page_by</tt>
-      def default_page_by
-        (defined?(@_default_page_by) && @_default_page_by) || Cursor.config.default_page_by
+      # This model's default +paginate_by+ field
+      # returns +default_paginate_by+ value unless explicitly overridden via <tt>paginate_by</tt>
+      def default_paginate_by
+        (defined?(@_default_paginate_by) && @_default_paginate_by) || Cursor.config.default_paginate_by
       end
 
-      # This model's default field +processors+
-      # returns +default_processors+ unless explicitly overridden via <tt>page_by</tt>
-      def default_processors
-        (defined?(@_default_processors) && @_default_processors) || Cursor.config.default_processors
+      # This model's cursor field +processors+
+      # returns +nil+ unless explicitly overridden via <tt>paginate_by</tt>
+      def cursor_processors
+        (defined?(@_cursor_processors) && @_cursor_processors) || []
       end
     end
   end

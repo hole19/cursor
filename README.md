@@ -65,7 +65,7 @@ The ``since`` option will return the most recent results since the specified id.
 You can configure the following default values by overriding these values using Cursor.configure method.
 
 ```
-default_paginate_by # :id by default (options: processors)
+default_paginate_by # :id by default
 default_per_page    # 25 by default
 max_per_page        # nil by default
 page_method_name    # :page by default

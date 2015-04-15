@@ -33,12 +33,11 @@ module Cursor
 
       # Overrides the default +paginate_by+ field per model
       #   class Article < ActiveRecord::Base
-      #     paginate_by :created_at, { processors: [:to_i] }
+      #     paginate_by :created_at
       #   end
-      def paginate_by(field, options = {})
+      def paginate_by(field)
         if column_names.include?(field.to_s)
           @_default_paginate_by = field
-          @_cursor_processors   = options[:processors]
         else
           raise ArgumentError.new('Field is not a model column')
         end
@@ -48,12 +47,6 @@ module Cursor
       # returns +default_paginate_by+ value unless explicitly overridden via <tt>paginate_by</tt>
       def default_paginate_by
         (defined?(@_default_paginate_by) && @_default_paginate_by) || Cursor.config.default_paginate_by
-      end
-
-      # This model's cursor field +processors+
-      # returns +nil+ unless explicitly overridden via <tt>paginate_by</tt>
-      def cursor_processors
-        (defined?(@_cursor_processors) && @_cursor_processors) || []
       end
     end
   end

@@ -86,10 +86,13 @@ if defined? ActiveRecord
   end
 
   describe Cursor::ActiveRecordExtension do
-    before do
-      1.upto(100) { |i| User.create! name: "user#{'%03d' % i}", age: (i / 10) }
-      1.upto(100) { |i| GemDefinedModel.create! name: "user#{'%03d' % i}", age: (i / 10) }
-      1.upto(100) { |i| Device.create! name: "user#{'%03d' % i}", age: (i / 10) }
+    before :all do
+      [User, GemDefinedModel, Device].each do |m|
+        1.upto(100) { |i| m.create! name: "user#{'%03d' % i}", age: (i / 10) }
+      end
+    end
+    after :all do
+      [User, GemDefinedModel, Device].each(&:delete_all)
     end
 
     [User, Admin, GemDefinedModel, Device].each do |model_class|

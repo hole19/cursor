@@ -1,5 +1,13 @@
 
 module Cursor
+  module ActiveRecordModelConfigExtension
+    extend ActiveSupport::Concern
+
+    included do
+      self.send(:include, Cursor::ConfigurationMethods)
+    end
+  end
+
   module ActiveRecordModelExtension
     extend ActiveSupport::Concern
 

@@ -1,11 +1,9 @@
 module Cursor
   class Railtie < ::Rails::Railtie #:nodoc:
     initializer 'cursor' do |_app|
-      if Rails.env.test?
-        ActiveSupport.on_load(:active_record) do
-          ::ActiveRecord::Base.send :include, Cursor::ConfigurationMethods
-        end
-      end
+      # load configuration methods before they are called
+      # (devised to load the Rails testing environment correctly)
+      Cursor::Hooks.before_init
 
       config.after_initialize do
         Cursor::Hooks.init

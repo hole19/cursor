@@ -36,11 +36,7 @@ module Cursor
       #     paginate_by :created_at
       #   end
       def paginate_by(field)
-        if column_names.include?(field.to_s)
-          @_default_paginate_by = field
-        else
-          raise ArgumentError.new('Field is not a model column')
-        end
+        @_default_paginate_by = field
       end
 
       # This model's default +paginate_by+ field

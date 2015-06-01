@@ -25,8 +25,13 @@ module Cursor
     def predicted_next_cursor
       return @_predicted_next_cursor if defined? @_predicted_next_cursor
       @_predicted_next_cursor = nil
-      return @_predicted_next_cursor unless next_cursor && result.size == all.limit_value
-      @_predicted_next_cursor = next_cursor if all.where("#{table_name}.#{default_paginate_by} #{direction == :after ? '>' : '<'} ?", next_cursor).exists?
+      return @_predicted_next_cursor unless next_cursor && (since_query || result.size == all.limit_value)
+      
+      without_since do
+        @_predicted_next_cursor = next_cursor if all.where("#{table_name}.#{default_paginate_by} #{direction == :after ? '>' : '<'} ?", next_cursor).exists?
+      end
+
+      @_predicted_next_cursor
     end
 
     def prev_cursor
@@ -75,6 +80,21 @@ module Cursor
       params.delete(Cursor.config.after_param_name.to_s)
       params.delete(Cursor.config.since_param_name.to_s)
       [base, params]
+    end
+
+    def since_query
+      @since_query ||= direction == :before ? all.where_values.find { |v| v.is_a?(String) && /#{table_name}.#{default_paginate_by} >/ =~ v } : nil
+    end
+
+    def without_since
+      if since_query
+        since_index = all.where_values.index(since_query)
+        all.where_values.delete_at(since_index)
+      end
+
+      yield
+
+      all.where_values.insert(since_index, since_query) if since_query
     end
 
     def direction

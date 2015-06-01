@@ -282,6 +282,20 @@ if defined? ActiveRecord
           end
         end
 
+        context 'before page with since' do
+          subject { model_class.page(before: 26, since: 20) }
+          its(:next_cursor)           { should == 21 }
+          its(:predicted_next_cursor) { should == 21 }
+          its(:since_cursor)          { should == 25 }
+        end
+
+        context 'after page with since' do
+          subject { model_class.page(after: 26, since: 50) }
+          its(:next_cursor)           { should == 75 }
+          its(:predicted_next_cursor) { should == 75 }
+          its(:since_cursor)          { should == 75 }
+        end
+
         describe '#pagination' do
           context 'before' do
             subject { model_class.page.pagination('http://example.com') }

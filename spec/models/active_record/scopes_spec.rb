@@ -35,30 +35,38 @@ if defined? ActiveRecord
     it { should have(0).users }
   end
 
-  shared_examples_for 'before pagination' do
-    it do
-      expect(subject[:next_url]).to    include('before=76')
-      expect(subject[:prev_url]).to    include('after=100')
-      expect(subject[:refresh_url]).to include('since=100')
-      expect(subject[:prev_url].scan('after').length).to    eq(1)
-      expect(subject[:next_url].scan('before').length).to   eq(1)
-      expect(subject[:refresh_url].scan('since').length).to eq(1)
-      expect(subject[:next_url]).to_not    include('after', 'since')
-      expect(subject[:prev_url]).to_not    include('before', 'since')
-      expect(subject[:refresh_url]).to_not include('before', 'after')
-    end
+  shared_examples_for 'pagination for first before page' do
+    it { expect_pagination('before', 76, 100, 100) }
   end
 
-  shared_examples_for 'after pagination' do
-    it do
-      expect(subject[:next_url]).to    include('after=25')
-      expect(subject[:prev_url]).to    include('before=1')
-      expect(subject[:refresh_url]).to include('since=25')
-      expect(subject[:next_url].scan('after').length).to    eq(1)
-      expect(subject[:prev_url].scan('before').length).to   eq(1)
+  shared_examples_for 'pagination for first after page' do
+    it { expect_pagination('after', 25, 1, 25) }
+  end
+
+  def expect_pagination direction, next_cursor, prev_cursor, since_cursor
+    reverse_direction = (['after', 'before'] - [direction]).first
+
+    if next_cursor == 0
+      expect(subject.key?(:next_url)).to be_false
+    else
+      expect(subject[:next_url]).to    include("#{direction}=#{next_cursor}")
+      expect(subject[:next_url].scan(direction).length).to   eq(1)
+      expect(subject[:next_url]).to_not    include(reverse_direction, 'since')
+    end
+
+    if prev_cursor == 0
+      expect(subject.key?(:prev_url)).to be_false
+    else
+      expect(subject[:prev_url]).to    include("#{reverse_direction}=#{prev_cursor}")
+      expect(subject[:prev_url].scan(reverse_direction).length).to    eq(1)
+      expect(subject[:prev_url]).to_not    include(direction, 'since')
+    end
+
+    if since_cursor == 0
+      expect(subject.key?(:refresh_url)).to be_false
+    else
+      expect(subject[:refresh_url]).to include("since=#{since_cursor}")
       expect(subject[:refresh_url].scan('since').length).to eq(1)
-      expect(subject[:next_url]).to_not    include('before', 'since')
-      expect(subject[:prev_url]).to_not    include('after', 'since')
       expect(subject[:refresh_url]).to_not include('before', 'after')
     end
   end
@@ -195,22 +203,38 @@ if defined? ActiveRecord
         describe '#next_cursor' do
           context 'after 1st page' do
             subject { model_class.page(after: 0) }
-            its(:next_cursor) { should == 25 }
+            its(:next_cursor)           { should == 25 }
+            its(:predicted_next_cursor) { should == 25 }
           end
 
           context 'after middle page' do
             subject { model_class.page(after: 50) }
-            its(:next_cursor) { should == 75 }
+            its(:next_cursor)           { should == 75 }
+            its(:predicted_next_cursor) { should == 75 }
+          end
+
+          context 'after last page' do
+            subject { model_class.page(after: 75) }
+            its(:next_cursor)           { should == 100 }
+            its(:predicted_next_cursor) { should be_nil }
           end
 
           context 'before 1st page' do
             subject { model_class.page }
-            its(:next_cursor) { should == 76 }
+            its(:next_cursor)           { should == 76 }
+            its(:predicted_next_cursor) { should == 76 }
           end
 
           context 'before middle page' do
             subject { model_class.page(before: 50) }
-            its(:next_cursor) { should == 25 }
+            its(:next_cursor)           { should == 25 }
+            its(:predicted_next_cursor) { should == 25 }
+          end
+
+          context 'before last page' do
+            subject { model_class.page(before: 26) }
+            its(:next_cursor)           { should == 1 }
+            its(:predicted_next_cursor) { should be_nil }
           end
         end
 
@@ -261,42 +285,42 @@ if defined? ActiveRecord
         describe '#pagination' do
           context 'before' do
             subject { model_class.page.pagination('http://example.com') }
-            it_should_behave_like 'before pagination'
+            it_should_behave_like 'pagination for first before page'
           end
 
           context 'after' do
             subject { model_class.page(after: 0).pagination('http://example.com') }
-            it_should_behave_like 'after pagination'
+            it_should_behave_like 'pagination for first after page'
           end
 
           context 'since' do
             subject { model_class.page(since: 0).pagination('http://example.com?after=10&before=10') }
-            it_should_behave_like 'before pagination'
+            it_should_behave_like 'pagination for first before page'
           end
 
           context 'before with existing before query param' do
             subject { model_class.page(before: 101).pagination('http://example.com?before=10') }
-            it_should_behave_like 'before pagination'
+            it_should_behave_like 'pagination for first before page'
           end
 
           context 'before with existing after query param' do
             subject { model_class.page(before: 101).pagination('http://example.com?after=10') }
-            it_should_behave_like 'before pagination'
+            it_should_behave_like 'pagination for first before page'
           end
 
           context 'after with existing after query param' do
             subject { model_class.page(after: 0).pagination('http://example.com?after=10') }
-            it_should_behave_like 'after pagination'
+            it_should_behave_like 'pagination for first after page'
           end
 
           context 'after with existing before query param' do
             subject { model_class.page(after: 0).pagination('http://example.com?before=10') }
-            it_should_behave_like 'after pagination'
+            it_should_behave_like 'pagination for first after page'
           end
 
           context 'before with query params' do
             subject { model_class.page.pagination('http://example.com?a[]=one&a[]=two') }
-            it_should_behave_like 'before pagination'
+            it_should_behave_like 'pagination for first before page'
             specify { expect(subject[:next_url]).to include('a[]=one&a[]=two') }
           end
         end

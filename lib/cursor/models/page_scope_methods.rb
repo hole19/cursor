@@ -26,7 +26,7 @@ module Cursor
       return @_predicted_next_cursor if defined? @_predicted_next_cursor
       @_predicted_next_cursor = nil
       return @_predicted_next_cursor unless next_cursor && result.size == all.limit_value
-      @_predicted_next_cursor = next_cursor if all.where("#{default_paginate_by} #{direction == :after ? '>' : '<'} ?", next_cursor).exists?
+      @_predicted_next_cursor = next_cursor if all.where("#{table_name}.#{default_paginate_by} #{direction == :after ? '>' : '<'} ?", next_cursor).exists?
     end
 
     def prev_cursor

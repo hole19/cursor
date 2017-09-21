@@ -1,5 +1,13 @@
 
 module Cursor
+  module ActiveRecordModelConfigExtension
+    extend ActiveSupport::Concern
+
+    included do
+      self.send(:include, Cursor::ConfigurationMethods)
+    end
+  end
+
   module ActiveRecordModelExtension
     extend ActiveSupport::Concern
 
@@ -11,9 +19,10 @@ module Cursor
       eval <<-RUBY
         def self.#{Cursor.config.page_method_name}(options={})
           (options || {}).to_hash.symbolize_keys!
-          options[:direction] = options.keys.include?(:after) ? :after : :before
+          options[:direction] = options.keys.include?(Cursor.config.after_param_name) ? Cursor.config.after_param_name : Cursor.config.before_param_name
 
           on_cursor(options[options[:direction]], options[:direction]).
+          on_since(options[Cursor.config.since_param_name]).
           in_direction(options[:direction]).
           limit(default_per_page).extending do
             include Cursor::PageScopeMethods
@@ -21,16 +30,24 @@ module Cursor
         end
       RUBY
 
-      def self.on_cursor cursor_id, direction
-        if cursor_id.nil?
+      def self.on_cursor cursor_value, direction
+        if cursor_value.nil?
           where(nil)
         else
-          where(["#{self.table_name}.id #{direction == Cursor.config.after_param_name ? '>' : '<'} ?", cursor_id])
+          where(["#{table_name}.#{default_paginate_by} #{direction == Cursor.config.after_param_name ? '>' : '<'} ?", cursor_value])
+        end
+      end
+
+      def self.on_since since_value
+        if since_value.nil?
+          where(nil)
+        else
+          where("#{table_name}.#{default_paginate_by} > ?", since_value)
         end
       end
 
       def self.in_direction direction
-        reorder("#{self.table_name}.id #{direction == Cursor.config.after_param_name ? 'asc' : 'desc'}")
+        reorder("#{table_name}.#{default_paginate_by} #{direction == Cursor.config.after_param_name ? 'asc' : 'desc'}")
       end
     end
   end

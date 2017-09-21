@@ -31,6 +31,19 @@ module Cursor
         (defined?(@_max_per_page) && @_max_per_page) || Cursor.config.max_per_page
       end
 
+      # Overrides the default +paginate_by+ field per model
+      #   class Article < ActiveRecord::Base
+      #     paginate_by :created_at
+      #   end
+      def paginate_by(field)
+        @_default_paginate_by = field
+      end
+
+      # This model's default +paginate_by+ field
+      # returns +default_paginate_by+ value unless explicitly overridden via <tt>paginate_by</tt>
+      def default_paginate_by
+        (defined?(@_default_paginate_by) && @_default_paginate_by) || Cursor.config.default_paginate_by
+      end
     end
   end
 end

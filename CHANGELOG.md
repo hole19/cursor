@@ -1,3 +1,9 @@
+# 0.2.0
+
+* added support for since param in the page method
+  * included since_cursor and refresh_url to pagination results
+* added default_paginate_by configuration option to change the cursored model column. default remains :id
+
 # 0.1.2
 
 * added support for ActiveRecord version 4.2

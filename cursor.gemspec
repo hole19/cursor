@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'actionpack', ['>= 3.0.0']
 
   s.add_development_dependency 'bundler', ['>= 1.0.0']
-  s.add_development_dependency 'rake', ['>= 0']
+  s.add_development_dependency 'rake', ['>= 0', '< 11.0']
   s.add_development_dependency 'tzinfo', ['>= 0']
   s.add_development_dependency 'rspec', ['>= 0']
   s.add_development_dependency 'rspec-its', '~> 1.0.0.pre'

@@ -22,17 +22,17 @@ if defined? ActiveRecord
   end
 
   shared_examples_for 'the first after page' do
-    it { should have(25).users }
+    its(:size) { should eq(25) }
     its('first.name') { should == 'user001' }
   end
 
   shared_examples_for 'the first before page' do
-    it { should have(25).users }
+    its(:size) { should eq(25) }
     its('first.name') { should == 'user100' }
   end
 
   shared_examples_for 'blank page' do
-    it { should have(0).users }
+    its(:size) { should eq(0) }
   end
 
   shared_examples_for 'pagination for first before page' do
@@ -47,7 +47,7 @@ if defined? ActiveRecord
     reverse_direction = (['after', 'before'] - [direction]).first
 
     if next_cursor == 0
-      expect(subject.key?(:next_url)).to be_false
+      expect(subject.key?(:next_url)).to be false
     else
       expect(subject[:next_url]).to    include("#{direction}=#{next_cursor}")
       expect(subject[:next_url].scan(direction).length).to   eq(1)
@@ -55,7 +55,7 @@ if defined? ActiveRecord
     end
 
     if prev_cursor == 0
-      expect(subject.key?(:prev_url)).to be_false
+      expect(subject.key?(:prev_url)).to be false
     else
       expect(subject[:prev_url]).to    include("#{reverse_direction}=#{prev_cursor}")
       expect(subject[:prev_url].scan(reverse_direction).length).to    eq(1)
@@ -63,7 +63,7 @@ if defined? ActiveRecord
     end
 
     if since_cursor == 0
-      expect(subject.key?(:refresh_url)).to be_false
+      expect(subject.key?(:refresh_url)).to be false
     else
       expect(subject[:refresh_url]).to include("since=#{since_cursor}")
       expect(subject[:refresh_url].scan('since').length).to eq(1)
@@ -74,9 +74,9 @@ if defined? ActiveRecord
   describe Cursor::ActiveRecordExtension do
     it 'returns no after cursor when there are no records' do
       params = User.page(after: 0).pagination('http://example.com')
-      expect(params.key?(:next_url)).to    be_false
-      expect(params.key?(:prev_url)).to    be_false
-      expect(params.key?(:refresh_url)).to be_false
+      expect(params.key?(:next_url)).to    be false
+      expect(params.key?(:prev_url)).to    be false
+      expect(params.key?(:refresh_url)).to be false
       expect(params[:next_cursor]).to  be_nil
       expect(params[:prev_cursor]).to  be_nil
       expect(params[:since_cursor]).to be_nil
@@ -84,9 +84,9 @@ if defined? ActiveRecord
 
     it 'returns no before cursor when there are no records' do
       params = User.page(before: 0).pagination('http://example.com')
-      expect(params.key?(:next_url)).to    be_false
-      expect(params.key?(:prev_url)).to    be_false
-      expect(params.key?(:refresh_url)).to be_false
+      expect(params.key?(:next_url)).to    be false
+      expect(params.key?(:prev_url)).to    be false
+      expect(params.key?(:refresh_url)).to be false
       expect(params[:next_cursor]).to  be_nil
       expect(params[:prev_cursor]).to  be_nil
       expect(params[:since_cursor]).to be_nil
@@ -123,13 +123,13 @@ if defined? ActiveRecord
 
           context 'page 2 after' do
             subject { model_class.page(after: 25) }
-            it { should have(25).users }
+            its(:size) { should eq(25) }
             its('first.name') { should == 'user026' }
           end
 
           context 'page 2 before' do
             subject { model_class.page(before: 75) }
-            it { should have(25).users }
+            its(:size) { should eq(25) }
             its('first.name') { should == 'user074' }
           end
 
@@ -160,19 +160,19 @@ if defined? ActiveRecord
 
           context 'before > since' do
             subject { model_class.page(before: 50, since: 44) }
-            it { should have(5).users }
+            its(:size) { should eq(5) }
             its('first.name') { should == 'user049' }
           end
 
           context 'after > since' do
             subject { model_class.page(after: 50, since: 44) }
-            it { should have(25).users }
+            its(:size) { should eq(25) }
             its('first.name') { should == 'user051' }
           end
 
           context 'after < since' do
             subject { model_class.page(after: 50, since: 95) }
-            it { should have(5).users }
+            its(:size) { should eq(5) }
             its('first.name') { should == 'user096' }
           end
 
@@ -190,13 +190,13 @@ if defined? ActiveRecord
         describe '#per' do
           context 'default page per 5' do
             subject { model_class.page.per(5) }
-            it { should have(5).users }
+            its(:size) { should eq(5) }
             its('first.name') { should == 'user100' }
           end
 
           context 'default page per nil (using default)' do
             subject { model_class.page.per(nil) }
-            it { should have(model_class.default_per_page).users }
+            its(:size) { should eq(model_class.default_per_page) }
           end
         end
 

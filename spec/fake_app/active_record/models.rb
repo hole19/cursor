@@ -20,23 +20,28 @@ class User < ActiveRecord::Base
     group(cols).select("count(readerships.id) AS read_count, #{cols}").order('read_count DESC')
   }
 end
+
 class Authorship < ActiveRecord::Base
   belongs_to :user
   belongs_to :book
 end
+
 class Readership < ActiveRecord::Base
   belongs_to :user
   belongs_to :book
 end
+
 class Book < ActiveRecord::Base
   has_many :authorships
   has_many :readerships
   has_many :authors, :through => :authorships, :source => :user
   has_many :readers, :through => :readerships, :source => :user
 end
+
 # a model that is a descendant of AR::Base but doesn't directly inherit AR::Base
 class Admin < User
 end
+
 # a model with namespace
 class User::Address < ActiveRecord::Base
   belongs_to :user
@@ -46,6 +51,7 @@ end
 class Product < ActiveRecord::Base
   self.abstract_class = true
 end
+
 class Device < Product
 end
 

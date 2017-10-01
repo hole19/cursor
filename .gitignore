@@ -1,6 +1,7 @@
 *.gem
 .bundle
 .idea
+.ruby-version
 Gemfile.lock
 gemfiles/*.lock
 coverage/*

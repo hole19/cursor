@@ -10,6 +10,7 @@ github 'rails/rails' do
   gem 'activerecord', require: 'active_record'
 end
 
+gem 'rack', github: 'rack/rack'
 gem 'arel', github: 'rails/arel'
 
 platforms :ruby do

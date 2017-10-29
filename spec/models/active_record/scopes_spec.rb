@@ -203,38 +203,32 @@ if defined? ActiveRecord
         describe '#next_cursor' do
           context 'after 1st page' do
             subject { model_class.page(after: 0) }
-            its(:next_cursor)           { should == 25 }
-            its(:predicted_next_cursor) { should == 25 }
+            its(:next_cursor) { should == 25 }
           end
 
           context 'after middle page' do
             subject { model_class.page(after: 50) }
-            its(:next_cursor)           { should == 75 }
-            its(:predicted_next_cursor) { should == 75 }
+            its(:next_cursor) { should == 75 }
           end
 
           context 'after last page' do
             subject { model_class.page(after: 75) }
-            its(:next_cursor)           { should == 100 }
-            its(:predicted_next_cursor) { should be_nil }
+            its(:next_cursor) { should == 100 }
           end
 
           context 'before 1st page' do
             subject { model_class.page }
-            its(:next_cursor)           { should == 76 }
-            its(:predicted_next_cursor) { should == 76 }
+            its(:next_cursor) { should == 76 }
           end
 
           context 'before middle page' do
             subject { model_class.page(before: 50) }
-            its(:next_cursor)           { should == 25 }
-            its(:predicted_next_cursor) { should == 25 }
+            its(:next_cursor) { should == 25 }
           end
 
           context 'before last page' do
             subject { model_class.page(before: 26) }
-            its(:next_cursor)           { should == 1 }
-            its(:predicted_next_cursor) { should be_nil }
+            its(:next_cursor) { should == 1 }
           end
         end
 
@@ -284,16 +278,14 @@ if defined? ActiveRecord
 
         context 'before page with since' do
           subject { model_class.page(before: 26, since: 20) }
-          its(:next_cursor)           { should == 21 }
-          its(:predicted_next_cursor) { should == 21 }
-          its(:since_cursor)          { should == 25 }
+          its(:next_cursor)  { should be_nil }
+          its(:since_cursor) { should == 25 }
         end
 
         context 'after page with since' do
           subject { model_class.page(after: 26, since: 50) }
-          its(:next_cursor)           { should == 75 }
-          its(:predicted_next_cursor) { should == 75 }
-          its(:since_cursor)          { should == 75 }
+          its(:next_cursor)  { should == 75 }
+          its(:since_cursor) { should == 75 }
         end
 
         describe '#pagination' do

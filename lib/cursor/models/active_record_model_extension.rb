@@ -47,7 +47,7 @@ module Cursor
       end
 
       def self.in_direction direction
-        reorder("#{table_name}.#{default_paginate_by} #{direction == Cursor.config.after_param_name ? 'asc' : 'desc'}")
+        reorder(Arel.sql("#{table_name}.#{default_paginate_by} #{direction == Cursor.config.after_param_name ? 'asc' : 'desc'}"))
       end
     end
   end

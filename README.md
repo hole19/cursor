@@ -89,15 +89,15 @@ rake spec:all
 
 To target the test suite against one framework:
 ```
-rake spec:active_record_51
+rake spec:active_record_61
 ```
 
 You can find a list of supported spec tasks by running <tt>rake -T</tt>. You may also find it useful to run a specific test
 for a specific framework. To do so, you'll have to first make sure you have bundled everything for that configuration,
 then you can run the specific test:
 ```
-BUNDLE_GEMFILE='gemfiles/active_record_51.gemfile' bundle install
-BUNDLE_GEMFILE='gemfiles/active_record_51.gemfile' bundle exec rspec
+BUNDLE_GEMFILE='gemfiles/active_record_61.gemfile' bundle install
+BUNDLE_GEMFILE='gemfiles/active_record_61.gemfile' bundle exec rspec
 ```
 
 

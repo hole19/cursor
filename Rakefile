@@ -20,8 +20,6 @@ namespace :spec do
     active_record_52
     active_record_51
     active_record_50
-    active_record_42
-    active_record_41
   )
 
   mappers.each do |gemfile|

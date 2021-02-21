@@ -1,0 +1,15 @@
+sqlite3: &sqlite3
+  adapter: sqlite3
+  database: <%= File.expand_path '../spec/fake_app/cursor_test.sqlite3', __FILE__ %>
+  pool: 5
+  timeout: 5000
+
+postgresql: &postgresql
+  adapter: postgresql
+  host: localhost
+  username: postgres
+  password:
+  database: cursor_test
+
+test:
+  <<: *<%= ENV['DB'] %>

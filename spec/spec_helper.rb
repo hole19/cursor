@@ -1,24 +1,22 @@
+# frozen_string_literal: true
+
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
-begin
-  require 'rails'
-rescue LoadError
-end
+ENV['RAILS_ENV'] ||= 'test'
+ENV['DB'] ||= 'sqlite3'
+
+require 'rails'
+require 'active_record'
 
 require 'bundler/setup'
 Bundler.require
 
-require 'database_cleaner'
-
 # Simulate a gem providing a subclass of ActiveRecord::Base before the Railtie is loaded.
-require 'fake_gem' if defined? ActiveRecord
+require 'fake_gem'
 
-if defined? Rails
-  require 'fake_app/rails_app'
-
-  require 'rspec/rails'
-end
+require 'fake_app/rails_app'
+require 'rspec/rails'
 require 'rspec/its'
 
 # Requires supporting files with custom matchers and macros, etc,

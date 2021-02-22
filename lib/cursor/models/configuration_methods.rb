@@ -1,3 +1,5 @@
+require 'active_support/concern'
+
 module Cursor
   module ConfigurationMethods
     extend ActiveSupport::Concern

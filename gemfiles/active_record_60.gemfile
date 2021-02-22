@@ -1,14 +1,8 @@
 source 'https://rubygems.org'
 
-git_source(:github) do |repo_name|
-  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-  "https://github.com/#{repo_name}.git"
-end
-
-github 'rails/rails', branch: 'main' do
-  gem 'railties'
-  gem 'activerecord', require: 'active_record'
-end
+gem 'railties', '~> 6.0.0'
+gem 'activerecord', '~> 6.0.0', require: 'active_record'
+gem 'rspec-rails', '~> 4.0.0'
 
 platforms :ruby do
   gem 'sqlite3', require: false
@@ -24,7 +18,5 @@ platforms :rbx do
   gem 'minitest'
   gem 'rubinius-developer_tools'
 end
-
-gem 'rspec-rails', '~> 4.0.0'
 
 gemspec path: '../'

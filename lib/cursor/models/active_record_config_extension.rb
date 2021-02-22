@@ -3,7 +3,7 @@ require 'cursor/models/active_record_model_extension'
 module Cursor
   module ActiveRecordConfigExtension
     extend ActiveSupport::Concern
-    
+
     module ClassMethods
       # Future subclasses will pick up the model extension
       def inherited(kls) #:nodoc:

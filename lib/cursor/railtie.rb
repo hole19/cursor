@@ -5,7 +5,7 @@ module Cursor
       # (devised to load the Rails testing environment correctly)
       Cursor::Hooks.before_init
 
-      # evaluate dynamic extensions after Rails initialization 
+      # evaluate dynamic extensions after Rails initialization
       # to enable custom configuration for gem defined models
       config.after_initialize do
         Cursor::Hooks.init

@@ -4,7 +4,7 @@ module Cursor
     extend ActiveSupport::Concern
 
     included do
-      self.send(:include, Cursor::ConfigurationMethods)
+      include Cursor::ConfigurationMethods
     end
   end
 
@@ -12,11 +12,11 @@ module Cursor
     extend ActiveSupport::Concern
 
     included do
-      self.send(:include, Cursor::ConfigurationMethods)
+      include Cursor::ConfigurationMethods
 
       # Fetch the values at the specified page edge
-      #   Model.page(after: 5)
-      eval <<-RUBY
+      #   Model.cursor(after: 5)
+      eval <<-RUBY, nil, __FILE__, __LINE__ + 1
         def self.#{Cursor.config.page_method_name}(options={})
           (options || {}).to_hash.symbolize_keys!
           options[:direction] = options.keys.include?(Cursor.config.after_param_name) ? Cursor.config.after_param_name : Cursor.config.before_param_name
@@ -47,7 +47,7 @@ module Cursor
       end
 
       def self.in_direction direction
-        reorder("#{table_name}.#{default_paginate_by} #{direction == Cursor.config.after_param_name ? 'asc' : 'desc'}")
+        reorder(Arel.sql("#{table_name}.#{default_paginate_by} #{direction == Cursor.config.after_param_name ? 'asc' : 'desc'}"))
       end
     end
   end

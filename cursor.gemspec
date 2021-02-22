@@ -29,6 +29,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec', ['>= 0']
   s.add_development_dependency 'rspec-its', '~> 1.0.0.pre'
   s.add_development_dependency 'rr', ['>= 0']
-  s.add_development_dependency 'database_cleaner', ['~> 1.2.0']
   s.add_development_dependency 'rdoc', ['>= 0']
 end

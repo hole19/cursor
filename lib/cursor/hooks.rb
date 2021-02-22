@@ -1,3 +1,5 @@
+require 'active_support/lazy_load_hooks'
+
 module Cursor
   class Hooks
     def self.before_init

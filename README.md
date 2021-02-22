@@ -12,7 +12,7 @@ Suppose we have users with ids 1..100
 
 ```
 > User.page(before: 50).per(5)
-=> [#<User id: 49>, #<User id: 48>, #<User id: 47>, #<User id: 46>, #<User id: 45>]  
+=> [#<User id: 49>, #<User id: 48>, #<User id: 47>, #<User id: 46>, #<User id: 45>]
 > User.page(before: 50).per(5).next_cursor
 => 45
 > User.page(before: 50).per(5).prev_cursor
@@ -25,7 +25,7 @@ The before id is NOT included in the results. The next and previous cursors are 
 
 ```
 > User.page(after: 44).per(5)
-=> [#<User id: 45>, #<User id: 46>, #<User id: 47>, #<User id: 48>, #<User id: 49>]  
+=> [#<User id: 45>, #<User id: 46>, #<User id: 47>, #<User id: 48>, #<User id: 49>]
 > User.page(before: 50).per(5).next_cursor
 => 49
 > User.page(before: 50).per(5).prev_cursor
@@ -38,14 +38,14 @@ Note that the results are reversed from the before. Before implies order desc. A
 
 ```
 > User.page
-=> [#<User id: 100>, #<User id: 99>, ... #<User id: 77>, #<User id: 76>]  
+=> [#<User id: 100>, #<User id: 99>, ... #<User id: 77>, #<User id: 76>]
 ```
 
 The default direction is *before* and the default ``per_page`` value is 25.
 
 ```
 > User.page(before: 50, since: 46).per(5)
-=> [#<User id: 49>, #<User id: 48>, #<User id: 47>]  
+=> [#<User id: 49>, #<User id: 48>, #<User id: 47>]
 > User.page(before: 50, since: 46).per(5).next_cursor
 => 49
 > User.page(before: 50, since: 46).per(5).prev_cursor
@@ -54,7 +54,7 @@ The default direction is *before* and the default ``per_page`` value is 25.
 => 49
 
 > User.page(since: 46).per(5)
-=> [#<User id: 100>, #<User id: 99>, #<User id: 98>, #<User id: 97>, #<User id: 96>]  
+=> [#<User id: 100>, #<User id: 99>, #<User id: 98>, #<User id: 97>, #<User id: 96>]
 ```
 
 The ``since`` option will return the most recent results since the specified id.
@@ -89,15 +89,15 @@ rake spec:all
 
 To target the test suite against one framework:
 ```
-rake spec:active_record_40
+rake spec:active_record_61
 ```
 
 You can find a list of supported spec tasks by running <tt>rake -T</tt>. You may also find it useful to run a specific test
 for a specific framework. To do so, you'll have to first make sure you have bundled everything for that configuration,
 then you can run the specific test:
 ```
-BUNDLE_GEMFILE='gemfiles/active_record_40.gemfile' bundle install
-BUNDLE_GEMFILE='gemfiles/active_record_40.gemfile' bundle exec rspec
+BUNDLE_GEMFILE='gemfiles/active_record_61.gemfile' bundle install
+BUNDLE_GEMFILE='gemfiles/active_record_61.gemfile' bundle exec rspec
 ```
 
 

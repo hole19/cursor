@@ -1,3 +1,6 @@
+* removed support for ActiveRecord versions 4.1 and 4.2
+* added support up to ActiveRecord version 6.1
+
 # 0.2.0
 
 * added support for since param in the page method

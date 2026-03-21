@@ -1,5 +1,3 @@
-require 'active_support/configurable'
-
 module Cursor
   # Configures global settings for Cursor
   #   Cursor.configure do |config|
